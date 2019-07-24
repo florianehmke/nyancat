@@ -3,5 +3,4 @@ kind: NyanCatMiner
 metadata:
   name: example-nyancatminer
 spec:
-  # Add fields here
-  size: 3
+  replicas: 3

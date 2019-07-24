@@ -2,13 +2,15 @@ package nyancatminer
 
 import (
 	"context"
+	"k8s.io/apimachinery/pkg/labels"
+	"reflect"
 
 	nyancatv1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
+	_ "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -100,32 +102,77 @@ func (r *ReconcileNyanCatMiner) Reconcile(request reconcile.Request) (reconcile.
 		return reconcile.Result{}, err
 	}
 
-	// Define a new Pod object
-	pod := newPodForCR(instance)
-
-	// Set NyanCatMiner instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
+	// List all pods owned by this instance
+	podList := &corev1.PodList{}
+	lbs := map[string]string{
+		"app":     instance.Name,
+		"version": "v0.1",
+	}
+	labelSelector := labels.SelectorFromSet(lbs)
+	listOps := &client.ListOptions{Namespace: instance.Namespace, LabelSelector: labelSelector}
+	if err = r.client.List(context.TODO(), listOps, podList); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
-	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
+	// Count the pods that are pending or running as available
+	var available []corev1.Pod
+	for _, pod := range podList.Items {
+		if pod.ObjectMeta.DeletionTimestamp != nil {
+			continue
+		}
+		if pod.Status.Phase == corev1.PodRunning || pod.Status.Phase == corev1.PodPending {
+			available = append(available, pod)
+		}
+	}
+	numAvailable := int32(len(available))
+	availableNames := []string{}
+	for _, pod := range available {
+		availableNames = append(availableNames, pod.ObjectMeta.Name)
+	}
+
+	// Update the status if necessary
+	status := nyancatv1.NyanCatMinerStatus{
+		PodNames: availableNames,
+	}
+	if !reflect.DeepEqual(instance.Status, status) {
+		instance.Status = status
+		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
+			reqLogger.Error(err, "Failed to update status")
 			return reconcile.Result{}, err
 		}
-
-		// Pod created successfully - don't requeue
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		return reconcile.Result{}, err
 	}
 
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
+	if numAvailable > instance.Spec.Replicas {
+		reqLogger.Info("Scaling down pods", "Currently available", numAvailable, "Required replicas", instance.Spec.Replicas)
+		diff := numAvailable - instance.Spec.Replicas
+		dpods := available[:diff]
+		for _, dpod := range dpods {
+			err = r.client.Delete(context.TODO(), &dpod)
+			if err != nil {
+				reqLogger.Error(err, "Failed to delete pod", "pod.name", dpod.Name)
+				return reconcile.Result{}, err
+			}
+		}
+		return reconcile.Result{Requeue: true}, nil
+	}
+
+	if numAvailable < instance.Spec.Replicas {
+		reqLogger.Info("Scaling up pods", "Currently available", numAvailable, "Required replicas", instance.Spec.Replicas)
+		// Define a new Pod object
+		pod := newPodForCR(instance)
+		// Set instance as the owner and controller
+		if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
+			return reconcile.Result{}, err
+		}
+		err = r.client.Create(context.TODO(), pod)
+		if err != nil {
+			reqLogger.Error(err, "Failed to create pod", "pod.name", pod.Name)
+			return reconcile.Result{}, err
+		}
+		return reconcile.Result{Requeue: true}, nil
+	}
+
 	return reconcile.Result{}, nil
 }
 
