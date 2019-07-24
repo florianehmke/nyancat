@@ -28,8 +28,21 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            replicas:
+              format: int32
+              type: integer
+          required:
+          - replicas
           type: object
         status:
+          properties:
+            podNames:
+              items:
+                type: string
+              type: array
+          required:
+          - podNames
           type: object
   version: v1
   versions:

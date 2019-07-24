@@ -65,7 +65,15 @@ func schema_pkg_apis_nyancat_v1_NyanCatMinerSpec(ref common.ReferenceCallback) c
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "NyanCatMinerSpec defines the desired state of NyanCatMiner",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"replicas": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+				},
+				Required: []string{"replicas"},
 			},
 		},
 		Dependencies: []string{},
@@ -77,7 +85,22 @@ func schema_pkg_apis_nyancat_v1_NyanCatMinerStatus(ref common.ReferenceCallback)
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "NyanCatMinerStatus defines the observed state of NyanCatMiner",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"podNames": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"podNames"},
 			},
 		},
 		Dependencies: []string{},
