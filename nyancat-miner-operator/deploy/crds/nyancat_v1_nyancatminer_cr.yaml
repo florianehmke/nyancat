@@ -1,0 +1,7 @@
+apiVersion: nyancat/v1
+kind: NyanCatMiner
+metadata:
+  name: example-nyancatminer
+spec:
+  # Add fields here
+  size: 3
