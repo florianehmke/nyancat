@@ -2,13 +2,13 @@ package nyancatminer
 
 import (
 	"context"
-	"k8s.io/apimachinery/pkg/labels"
 	"reflect"
 
-	nyancatv1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1"
+	nyancatv1alpha1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	_ "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -48,7 +48,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource NyanCatMiner
-	err = c.Watch(&source.Kind{Type: &nyancatv1.NyanCatMiner{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &nyancatv1alpha1.NyanCatMiner{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource Pods and requeue the owner NyanCatMiner
 	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &nyancatv1.NyanCatMiner{},
+		OwnerType:    &nyancatv1alpha1.NyanCatMiner{},
 	})
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (r *ReconcileNyanCatMiner) Reconcile(request reconcile.Request) (reconcile.
 	reqLogger.Info("Reconciling NyanCatMiner")
 
 	// Fetch the NyanCatMiner instance
-	instance := &nyancatv1.NyanCatMiner{}
+	instance := &nyancatv1alpha1.NyanCatMiner{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -131,7 +131,7 @@ func (r *ReconcileNyanCatMiner) Reconcile(request reconcile.Request) (reconcile.
 	}
 
 	// Update the status if necessary
-	status := nyancatv1.NyanCatMinerStatus{
+	status := nyancatv1alpha1.NyanCatMinerStatus{
 		PodNames: availableNames,
 	}
 	if !reflect.DeepEqual(instance.Status, status) {
@@ -177,7 +177,7 @@ func (r *ReconcileNyanCatMiner) Reconcile(request reconcile.Request) (reconcile.
 }
 
 // newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *nyancatv1.NyanCatMiner) *corev1.Pod {
+func newPodForCR(cr *nyancatv1alpha1.NyanCatMiner) *corev1.Pod {
 	labels := map[string]string{
 		"app": cr.Name,
 	}

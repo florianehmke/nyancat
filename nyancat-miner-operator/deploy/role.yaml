@@ -53,7 +53,7 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - nyancat
+  - nyancat.example.com
   resources:
   - '*'
   verbs:

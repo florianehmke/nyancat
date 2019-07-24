@@ -1,4 +1,4 @@
-apiVersion: nyancat/v1
+apiVersion: nyancat.example.com/v1alpha1
 kind: NyanCatMiner
 metadata:
   name: example-nyancatminer
