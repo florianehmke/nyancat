@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: nyancatminers.nyancat.example.com
+  name: nyancatminers.nyancat.florianehmke.github.com
 spec:
-  group: nyancat.example.com
+  group: nyancat.florianehmke.github.com
   names:
     kind: NyanCatMiner
     listKind: NyanCatMinerList

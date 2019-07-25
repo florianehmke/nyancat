@@ -2,6 +2,7 @@ package nyancatminer
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	nyancatv1alpha1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1alpha1"
@@ -10,7 +11,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
-	_ "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
