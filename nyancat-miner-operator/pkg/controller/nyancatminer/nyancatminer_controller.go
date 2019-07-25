@@ -2,7 +2,6 @@ package nyancatminer
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 
 	nyancatv1alpha1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1alpha1"
@@ -179,13 +178,14 @@ func (r *ReconcileNyanCatMiner) Reconcile(request reconcile.Request) (reconcile.
 // newPodForCR returns a busybox pod with the same name/namespace as the cr
 func newPodForCR(cr *nyancatv1alpha1.NyanCatMiner) *corev1.Pod {
 	labels := map[string]string{
-		"app": cr.Name,
+		"app":     cr.Name,
+		"version": "v0.1",
 	}
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
-			Namespace: cr.Namespace,
-			Labels:    labels,
+			GenerateName: cr.Name + "-pod",
+			Namespace:    cr.Namespace,
+			Labels:       labels,
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
