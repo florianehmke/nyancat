@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package api;
+
+service Miner {
+  rpc MineCat (MineRequest) returns (MineReply) {}
+}
+
+message MineRequest {
+  string id = 1;
+}
+
+message MineReply {
+  string id = 1;
+  string cat = 2;
+}
