@@ -1,4 +1,4 @@
-package nyancatminer
+package miner
 
 import (
 	"math/rand"
@@ -59,7 +59,7 @@ var nyan = [...]string{"[^._.^]ﾉ彡",
 	"(=◕ᆽ◕= ✿)",
 }
 
-func NyanCat() string {
+func MineCat() string {
 	rand.Seed(time.Now().Unix())
 	message := nyan[rand.Intn(len(nyan))]
 	return message

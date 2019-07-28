@@ -11,8 +11,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 
-	"github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis"
-	"github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/controller"
+	"github.com/florianehmke/nyancat/operator/pkg/apis"
+	"github.com/florianehmke/nyancat/operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"

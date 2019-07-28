@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1alpha1"
+	"github.com/florianehmke/nyancat/operator/pkg/apis/nyancat/v1alpha1"
 )
 
 func init() {

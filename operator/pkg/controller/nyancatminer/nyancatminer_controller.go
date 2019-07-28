@@ -4,7 +4,7 @@ import (
 	"context"
 	"reflect"
 
-	nyancatv1alpha1 "github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/apis/nyancat/v1alpha1"
+	nyancatv1alpha1 "github.com/florianehmke/nyancat/operator/pkg/apis/nyancat/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

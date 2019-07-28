@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/florianehmke/nyancat/nyancat-miner-operator/pkg/controller/nyancatminer"
+	"github.com/florianehmke/nyancat/operator/pkg/controller/nyancatminer"
 )
 
 func init() {
