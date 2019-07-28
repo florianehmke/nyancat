@@ -23,8 +23,9 @@ func NewController() *Controller {
 }
 
 func (c *Controller) Start() {
-	c.wg.Add(1)
+	c.wg.Add(2)
 	go c.RequestCats()
+	go c.ServeManagementApi()
 
 	// replace with http api
 	c.mr.AddMiner("localhost:50051")
