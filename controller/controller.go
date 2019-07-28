@@ -27,9 +27,6 @@ func (c *Controller) Start() {
 	go c.RequestCats()
 	go c.ServeManagementApi()
 
-	// replace with http api
-	c.mr.AddMiner("localhost:50051")
-
 	c.wg.Wait()
 }
 

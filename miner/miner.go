@@ -1,17 +1,19 @@
 package miner
 
 import (
-	"google.golang.org/grpc"
+	"context"
 	"log"
 	"math/rand"
 	"net"
 	"time"
 
-	"context"
-	pb "github.com/florianehmke/nyancat/api"
+	"google.golang.org/grpc"
+
+	"github.com/florianehmke/nyancat/api"
 )
 
-var nyan = [...]string{"[^._.^]ﾉ彡",
+var nyans = []string{
+	"[^._.^]ﾉ彡",
 	"~=[,,_,,]:3",
 	"(ﾐㆁ ﻌ ㆁﾐ)∫",
 	"=^._.^= ∫ ",
@@ -67,7 +69,7 @@ var nyan = [...]string{"[^._.^]ﾉ彡",
 
 func MineCat() string {
 	rand.Seed(time.Now().Unix())
-	message := nyan[rand.Intn(len(nyan))]
+	message := nyans[rand.Intn(len(nyans))]
 	return message
 }
 
@@ -77,9 +79,9 @@ const (
 
 type server struct{}
 
-func (s *server) MineCat(ctx context.Context, in *pb.MineRequest) (*pb.MineReply, error) {
-	log.Printf("Received: %v", in.Id)
-	return &pb.MineReply{Id: in.Id, Cat: MineCat()}, nil
+func (s *server) MineCat(ctx context.Context, in *api.MineRequest) (*api.MineReply, error) {
+	log.Printf("Processing Request: %v", in.Id)
+	return &api.MineReply{Id: in.Id, Cat: MineCat()}, nil
 }
 
 func Serve() {
@@ -88,7 +90,7 @@ func Serve() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterMinerServer(s, &server{})
+	api.RegisterMinerServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
