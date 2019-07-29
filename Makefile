@@ -1,4 +1,4 @@
-.PHONY: build deploy
+.PHONY: build build-controller build-miner upload upload-miner upload-controller
 
 TAG?=$(shell git describe --tags)
 export TAG

@@ -12,3 +12,7 @@
 *.out
 
 .idea
+
+# built binaries
+build/controller/controller
+build/miner/miner
